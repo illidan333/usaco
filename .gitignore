@@ -1,0 +1,23 @@
+# Ignore common C/C++ build artifacts and editor/workspace files
+# Binaries
+*.o
+*.out
+*.exe
+solution
+test
+
+# Build directories
+build/
+bin/
+
+# VS Code
+.vscode/
+
+# Mac/Linux editor files
+*.swp
+*~
+.DS_Store
+
+# Logs and temporary
+*.log
+out

@@ -1,5 +1,13 @@
 # Solution Summary
 
+This file has been moved to the problem folder:
+
+/workspaces/usaco/prob2_silver_season26contest1/SOLUTION_SUMMARY.md
+
+Please open that file for usage and test-run instructions.
+
+# Solution Summary
+
 ## Overview
 This directory contains a complete solution to the USACO Silver problem about optimizing nuclear reactor rod energy values.
 
@@ -103,18 +111,34 @@ All 13/13 tests PASS ✓
 
 ## Usage
 
+Build and run commands (run from the `prob2_silver_season26contest1` folder):
+
 ```bash
-# Compile
-g++ -o solution solution.cpp -std=c++17 -O2
+# enter the problem folder
+cd prob2_silver_season26contest1
 
-# Run
-./solution < input.in
+# compile the solution
+g++ -std=c++17 -O2 solution.cpp -o solution
 
-# Test all cases
+# run a single test (example: test 1)
+./solution < 1.in
+
+# run all tests (1..13) and report pass/fail
 for i in {1..13}; do
-  ./solution < $i.in | diff -q - $i.out || echo "Test $i failed"
+   ./solution < "$i.in" > out && diff -q out "$i.out" && echo "Test $i: PASS" || echo "Test $i: FAIL"
 done
+
+# optional: use the provided test harness (if executable)
+if [ -x ./test ]; then
+   ./test
+fi
 ```
+
+Notes:
+- Input files are named `1.in`, `2.in`, ...; expected outputs are `1.out`, `2.out`, ...
+- Ensure `solution` is executable (`chmod +x solution`) before running the loop.
+
+If the test loop produces only `Test N: PASS` messages (or no failures), all tests matched their expected outputs.
 
 ## Complexity
 
