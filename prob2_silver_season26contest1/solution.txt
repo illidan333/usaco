@@ -1,0 +1,169 @@
+(Analysis by Akshaj Arora)
+Subtask 1: All Constraints Have x=y
+
+Each constraint is of the form ax+ax=z
+, which simplifies to ax=z2
+. Thus, if ax
+ appears in a constraint, it has at most one possible value. If z
+ is odd for that constraint, or ax
+ is in multiple constraints with different z
+ values, then no value of ax
+ is possible, so the answer is −1
+.
+
+Else, assume that an array is possible. For all ax
+ in a constraint, rod x
+ can only generate power if lx≤z2≤rx
+. For all other rods x
+, they can always generate power when set to ax=lx
+.
+
+Subtask 2: All Constraints Have |x−y|=1
+
+Consider an undirected graph of N
+ nodes where each constraint is an edge between nodes x
+ and y
+ of weight z
+, representing the constraint ax+ay=z
+.
+
+In this subtask, each constraint connects consecutive indices, meaning that the graph is formed of chains. For each chain, Bessie can choose any value for the one index, and since ay=z−ax
+, this will uniquely determine the values of all other nodes in the chain. In fact, if the chosen node is node x
+, the values of ay
+ for all other nodes y
+ in the chain can be expressed as ay=c±ax
+. Hence, rod y
+ will generate energy if and only if ly≤c±ax≤ry
+, which is equivalent to ly−c≤±ax≤ry−c
+. This means that rod y
+ is good for an interval of values of ax
+.
+
+We can solve each chain independently. For each chain, choose a representative node x
+, and calculate the intervals of ax
+ for which each rod y
+ can generate energy. Then, we need to find the maximum number of intervals that ax
+ lies inside of. This is a standard problem that can be solved by sorting the endpoints of all the intervals and calculating of the number of active intervals at each point.
+
+Subtask 3: All Constraints Have |x−y|≤1
+
+This subtask combines the previous two subtasks. We can first run the algorithm for subtask 1 to determine which ax
+ values are fixed, or determine if the answer is −1
+s.
+
+For each chain, if it has no fixed values, then we can determine the maximum number of energy-generating rods in it using the algorithm from subtask 2. Otherwise, choose one of the fixed values in the chain and use it to calculate the values of every other node in the chain (which must also be fixed). Then, we can simply check if each rod in the chain can generate energy. If a chain has multiple fixed values that contradict each other, then the answer is simply −1
+.
+
+Full Solution
+
+For the full solution, we decompose the graph into connected components instead of chains. Using logic similar to that in subtask 2, it can be shown that choosing a value for ax
+ determines the values of all nodes in the connected component of node x
+. For each connected component, choose a representative node x
+ and run a depth-first search (DFS) starting from x
+ to determine the values of each node in the component in terms of ax
+.
+
+If the component contains cycles, then the same node can have multiple representations in terms of ax
+. This results a linear equation in terms of ax
+, which can either have 0
+, 1
+, or infinite solutions for ax
+. If it has 0
+ solutions, the answer is −1
+. If it has a unique solution, then either ax
+ is fixed (if the solution is an integer), or else the answer is −1
+.
+
+After the DFS, ax
+ is either fixed or not fixed. These are equivalent to the two cases in subtask 3, so the solution from subtask 3 can be used to calculate the maximum possible number of energy-generating rods in the connected component.
+
+Dong Liu's code:
+
+#include <bits/stdc++.h>
+using namespace std;
+ 
+typedef long long ll;
+ 
+void solve() {
+    int n, m;
+    cin >> n >> m;
+ 
+    vector<int> l(n), r(n);
+    for (int &i : l) cin >> i;
+    for (int &i : r) cin >> i;
+ 
+    vector<vector<pair<int, int>>> adj(n);
+    while (m--) {
+        int i, j, x;
+        cin >> i >> j >> x, i--, j--;
+        adj[i].push_back({j, x});
+        adj[j].push_back({i, x});
+    }
+ 
+    bool imp = false;
+    auto no = [&]() { imp = true; };
+ 
+    vector<bool> done(n);
+    vector<pair<int, ll>> set_v(n);
+    int ans = 0;
+ 
+    for (int i = 0; i < n; i++)
+        if (!done[i]) {
+            bool has_set = false;
+            ll set_x;
+            vector<pair<ll, int>> mod;
+ 
+            auto dfs = [&](auto self, int i, pair<int, ll> v) -> void {
+                if (done[i]) {
+                    if (set_v[i].first == v.first) {
+                        if (set_v[i].second != v.second) no();
+                    } else {
+                        ll x = set_v[i].first * set_v[i].second +
+                               v.first * v.second;
+                        x *= -1;
+                        if (x & 1) no();
+                        else {
+                            x /= 2;
+                            if (!has_set) has_set = true, set_x = x;
+                            else if (x != set_x) no();
+                        }
+                    }
+                } else {
+                    if (v.first == 1) {
+                        mod.push_back({l[i] - v.second, 1});
+                        mod.push_back({1 + r[i] - v.second, -1});
+                    } else {
+                        mod.push_back({v.second - r[i], 1});
+                        mod.push_back({1 + v.second - l[i], -1});
+                    }
+                    done[i] = true;
+                    set_v[i] = v;
+                    for (auto [j, x] : adj[i])
+                        self(self, j, {-v.first, x - v.second});
+                }
+            };
+            dfs(dfs, i, {1, 0});
+ 
+            if (has_set) {
+                for (auto [x, y] : mod)
+                    if (x <= set_x) ans += y;
+            } else {
+                sort(mod.begin(), mod.end());
+                int cur = 0, opt = 0;
+                for (auto [x, y] : mod) opt = max(opt, cur += y);
+                ans += opt;
+            }
+        }
+    if (imp) {
+        cout << "-1\n";
+    } else {
+        cout << ans << '\n';
+    }
+}
+ 
+int main() {
+    cin.tie(0)->sync_with_stdio(0);
+    int T;
+    cin >> T;
+    while (T--) solve();
+}
