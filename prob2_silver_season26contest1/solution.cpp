@@ -3,64 +3,71 @@ using namespace std;
 
 typedef long long ll;
 
+int solveCase(int n, int m, vector<ll>& l, vector<ll>& r, vector<vector<pair<int, ll>>>& adj);
+
 int solveCase(int n, int m, vector<ll>& l, vector<ll>& r, vector<vector<pair<int, ll>>>& adj) {
-    bool imp = false;
-    auto no = [&]() { imp = true; };
+    bool isImpossible = false;
+    auto markImpossible = [&]() { isImpossible = true; };
 
-    vector<bool> done(n);
-    vector<pair<int, ll>> set_v(n);
-    int ans = 0;
+    vector<bool> visited(n);
+    vector<pair<int, ll>> expr(n);  // (coefficient, constant): a[i] = coef*x + constant
+    int totalRods = 0;
 
+    // Process each connected component independently
     for (int i = 0; i < n; i++) {
-        if (!done[i]) {
-            bool has_set = false;
-            ll set_x;
-            vector<pair<ll, int>> mod;
+        if (!visited[i]) {
+            bool hasFixedValue = false;
+            ll fixedValue;
+            vector<pair<ll, int>> intervals;
 
+            // DFS: express node in terms of representative variable
             auto dfs = [&](auto self, int i, pair<int, ll> v) -> void {
-                if (done[i]) {
-                    if (set_v[i].first == v.first) {
-                        if (set_v[i].second != v.second) no();
+                if (visited[i]) {
+                    // Cycle: check consistency
+                    if (expr[i].first == v.first) {
+                        if (expr[i].second != v.second) markImpossible();
                     } else {
-                        ll x = set_v[i].first * set_v[i].second +
-                               v.first * v.second;
+                        // Solve: expr[i].first*x + expr[i].second = v.first*x + v.second
+                        ll x = expr[i].first * expr[i].second + v.first * v.second;
                         x *= -1;
-                        if (x & 1) no();
+                        if (x & 1) markImpossible();
                         else {
                             x /= 2;
-                            if (!has_set) has_set = true, set_x = x;
-                            else if (x != set_x) no();
+                            if (!hasFixedValue) hasFixedValue = true, fixedValue = x;
+                            else if (x != fixedValue) markImpossible();
                         }
                     }
                 } else {
+                    // Record interval where rod can generate power
                     if (v.first == 1) {
-                        mod.push_back({l[i] - v.second, 1});
-                        mod.push_back({1 + r[i] - v.second, -1});
+                        intervals.push_back({l[i] - v.second, 1});
+                        intervals.push_back({1 + r[i] - v.second, -1});
                     } else {
-                        mod.push_back({v.second - r[i], 1});
-                        mod.push_back({1 + v.second - l[i], -1});
+                        intervals.push_back({v.second - r[i], 1});
+                        intervals.push_back({1 + v.second - l[i], -1});
                     }
-                    done[i] = true;
-                    set_v[i] = v;
+                    visited[i] = true;
+                    expr[i] = v;
                     for (auto [j, x] : adj[i])
                         self(self, j, {-v.first, x - v.second});
                 }
             };
             dfs(dfs, i, {1, 0});
 
-            if (has_set) {
-                for (auto [x, y] : mod)
-                    if (x <= set_x) ans += y;
+            // Count maximum feasible rods
+            if (hasFixedValue) {
+                for (auto [x, y] : intervals)
+                    if (x <= fixedValue) totalRods += y;
             } else {
-                sort(mod.begin(), mod.end());
+                sort(intervals.begin(), intervals.end());
                 int cur = 0, opt = 0;
-                for (auto [x, y] : mod) opt = max(opt, cur += y);
-                ans += opt;
+                for (auto [x, y] : intervals) opt = max(opt, cur += y);
+                totalRods += opt;
             }
         }
     }
 
-    return imp ? -1 : ans;
+    return isImpossible ? -1 : totalRods;
 }
 
 void solve() {
@@ -83,3 +90,13 @@ void solve() {
 
     cout << solveCase(n, m, l, r, adj) << "\n";
 }
+
+#ifndef INCLUDED_IN_TEST
+int main() {
+    cin.tie(0)->sync_with_stdio(0);
+    int T;
+    cin >> T;
+    while (T--) solve();
+    return 0;
+}
+#endif
