@@ -62,36 +62,247 @@ graph TD
        - Track maximum overlapping intervals
    ```
 
-## Example Walkthrough
+## Vivid Examples with Mermaid Graphs
 
-**Test Case 2:**
+### Example 1: Simple Linear Chain
+
+**Input:**
 ```
-Input: N=3, M=2
-l = [10, -10, 10]
-r = [10, -10, 10]
-Constraints: a_1 + a_2 = 0, a_2 + a_3 = 0
+3 rods, 2 constraints
+Rod 1: range [10, 20]
+Rod 2: range [5, 15]
+Rod 3: range [0, 10]
+Constraint 1: a₁ + a₂ = 25
+Constraint 2: a₂ + a₃ = 10
 ```
 
-**Graph:**
+**Graph Representation:**
+```mermaid
+graph LR
+    A["Rod 1<br/>[10,20]"] -->|"a₁+a₂=25"| B["Rod 2<br/>[5,15]"]
+    B -->|"a₂+a₃=10"| C["Rod 3<br/>[0,10]"]
 ```
-1 ---(0)--- 2 ---(0)--- 3
+
+**DFS Walkthrough:**
+
+1. **Start at Rod 1, let a₁ = x (free variable)**
+   - Rod 1: a₁ = x
+   - Interval from range [10,20]: **x ∈ [10, 20]**
+
+2. **Follow edge to Rod 2 via a₁ + a₂ = 25**
+   - a₂ = 25 - x
+   - Interval from range [5,15]: 5 ≤ 25-x ≤ 15  →  **x ∈ [10, 20]**
+
+3. **Follow edge to Rod 3 via a₂ + a₃ = 10**
+   - a₃ = 10 - a₂ = 10 - (25 - x) = x - 15
+   - Interval from range [0,10]: 0 ≤ x-15 ≤ 10  →  **x ∈ [15, 25]**
+
+4. **Find maximum x coverage (sweep-line):**
+
+   | x range | Rod 1 | Rod 2 | Rod 3 | Count |
+   |---------|-------|-------|-------|-------|
+   | [10, 15) | ✓ | ✓ | ✗ | 2 |
+   | [15, 20] | ✓ | ✓ | ✓ | **3** ⭐ |
+   | (20, 25] | ✗ | ✗ | ✓ | 1 |
+
+5. **Verify with x = 18:**
+   - a₁ = 18 (in [10,20]) ✓
+   - a₂ = 25 - 18 = 7 (in [5,15]) ✓
+   - a₃ = 18 - 15 = 3 (in [0,10]) ✓
+
+**Answer: 3 rods**
+
+---
+
+### Example 2: Cycle That Fixes x
+
+**Input:**
+```
+3 rods, 3 constraints (forms a cycle)
+Rod 1: range [10, 20]
+Rod 2: range [15, 25]
+Rod 3: range [5, 15]
+Constraint 1: a₁ + a₂ = 40
+Constraint 2: a₂ + a₃ = 30
+Constraint 3: a₃ + a₁ = 50
 ```
 
-**DFS from node 1:**
-- a_1 = 1·a_1 + 0
-- a_2 = -1·a_1 + 0  (from a_1 + a_2 = 0)
-- a_3 = 1·a_1 + 0   (from a_2 + a_3 = 0)
+**Graph Representation:**
+```mermaid
+graph TD
+    A["Rod 1<br/>[10,20]"] -->|"a₁+a₂=40"| B["Rod 2<br/>[15,25]"]
+    B -->|"a₂+a₃=30"| C["Rod 3<br/>[5,15]"]
+    C -->|"a₃+a₁=50"| A
+```
 
-**No cycles, a_1 is free**
+**DFS Walkthrough:**
 
-**Valid intervals for a_1:**
-- Rod 1: 10 ≤ a_1 ≤ 10 → [10, 11)
-- Rod 2: -10 ≤ -a_1 ≤ -10 → a_1 ∈ [10, 11)
-- Rod 3: 10 ≤ a_1 ≤ 10 → [10, 11)
+1. **Start at Rod 1: a₁ = x**
 
-**Sweep line:** Maximum 3 rods active at a_1=10
+2. **Edge to Rod 2: a₁ + a₂ = 40**
+   - a₂ = 40 - x
 
-**Answer: 3**
+3. **Edge to Rod 3: a₂ + a₃ = 30**
+   - a₃ = 30 - (40 - x) = x - 10
+
+4. **Back to Rod 1 (CYCLE!): a₃ + a₁ = 50**
+   - Check: (x - 10) + x = 50?
+   - 2x - 10 = 50
+   - **x = 30** (FIXED!)
+
+5. **Verify x = 30:**
+   - a₁ = 30 (need: 10 ≤ 30 ≤ 20) **✗ FAIL!**
+   - Since Rod 1 cannot satisfy a₁ = 30, impossible.
+
+**Answer: -1 (impossible)**
+
+---
+
+### Example 3: Two Separate Components
+
+**Input:**
+```
+4 rods, 2 constraints (disconnected)
+Rod 1: range [1, 10]
+Rod 2: range [1, 10]
+Rod 3: range [1, 10]
+Rod 4: range [1, 10]
+Constraint 1: a₁ + a₂ = 5
+Constraint 2: a₃ + a₄ = 5
+```
+
+**Graph Representation:**
+```mermaid
+graph LR
+    A["Rod 1<br/>[1,10]"] -->|"a₁+a₂=5"| B["Rod 2<br/>[1,10]"]
+    C["Rod 3<br/>[1,10]"] -->|"a₃+a₄=5"| D["Rod 4<br/>[1,10]"]
+```
+
+**Analysis:**
+
+**Component A (Rods 1 & 2):**
+- a₁ = x
+- a₂ = 5 - x
+- Rod 1: x ∈ [1, 10]
+- Rod 2: 1 ≤ 5-x ≤ 10 → x ∈ [-5, 4]
+- Intersection: [1, 4] → max **2 rods**
+
+**Component B (Rods 3 & 4):**
+- a₃ = y (independent variable!)
+- a₄ = 5 - y
+- Rod 3: y ∈ [1, 10]
+- Rod 4: 1 ≤ 5-y ≤ 10 → y ∈ [-5, 4]
+- Intersection: [1, 4] → max **2 rods**
+
+**Answer: 2 + 2 = 4 rods**
+
+---
+
+### Example 4: Negative Coefficient (Oscillating Values)
+
+**Input:**
+```
+2 rods, 1 constraint
+Rod 1: range [0, 10]
+Rod 2: range [0, 10]
+Constraint 1: a₁ + a₂ = 15
+```
+
+**Graph Representation:**
+```mermaid
+graph LR
+    A["Rod 1<br/>[0,10]"] -->|"a₁+a₂=15"| B["Rod 2<br/>[0,10]"]
+```
+
+**DFS Walkthrough:**
+
+1. **Start at Rod 1: a₁ = x**
+   - Interval: x ∈ [0, 10]
+
+2. **Edge to Rod 2: a₁ + a₂ = 15**
+   - a₂ = 15 - x (coefficient = -1, changes sign!)
+   - Interval: 0 ≤ 15-x ≤ 10 → x ∈ [5, 15]
+
+3. **Find maximum coverage:**
+
+   | x range | Rod 1 (x) | Rod 2 (15-x) | Count |
+   |---------|-----------|--------------|-------|
+   | [0, 5) | ✓ | ✗ | 1 |
+   | [5, 10] | ✓ | ✓ | **2** ⭐ |
+   | (10, 15] | ✗ | ✓ | 1 |
+
+4. **Verify with x = 7:**
+   - a₁ = 7 (in [0,10]) ✓
+   - a₂ = 15 - 7 = 8 (in [0,10]) ✓
+
+**Answer: 2 rods**
+
+---
+
+### Example 5: Contradiction (Multiple Edges)
+
+**Input:**
+```
+2 rods, 2 constraints (conflicting edges)
+Rod 1: range [10, 20]
+Rod 2: range [10, 20]
+Constraint 1: a₁ + a₂ = 5
+Constraint 2: a₁ + a₂ = 10
+```
+
+**Graph Representation:**
+```mermaid
+graph LR
+    A["Rod 1<br/>[10,20]"] -->|"a₁+a₂=5"| B["Rod 2<br/>[10,20]"]
+    A -->|"a₁+a₂=10"| B
+```
+
+**DFS Walkthrough:**
+
+1. **Start at Rod 1: a₁ = x**
+
+2. **First edge: a₁ + a₂ = 5**
+   - a₂ = 5 - x
+
+3. **Second edge: a₁ + a₂ = 10**
+   - a₂ = 10 - x
+
+4. **Contradiction detected:**
+   - Two paths give different formulas for a₂!
+   - 5 - x ≠ 10 - x for any x
+   - **Impossible**
+
+**Answer: -1 (impossible)**
+
+---
+
+### Test Case 2 (Original Example)
+
+**Input:**
+```
+3 rods, 2 constraints
+Rod 1: range [10, 10]
+Rod 2: range [-10, -10]
+Rod 3: range [10, 10]
+Constraint 1: a₁ + a₂ = 0
+Constraint 2: a₂ + a₃ = 0
+```
+
+**Graph Representation:**
+```mermaid
+graph LR
+    A["Rod 1<br/>[10,10]"] -->|"a₁+a₂=0"| B["Rod 2<br/>[-10,-10]"]
+    B -->|"a₂+a₃=0"| C["Rod 3<br/>[10,10]"]
+```
+
+**DFS:**
+1. a₁ = x, interval: [10, 10]
+2. a₂ = -x, interval: x ∈ [10, 10]
+3. a₃ = x, interval: [10, 10]
+
+**All three rods have x ∈ [10, 10]**
+
+**Answer: 3 rods** (pick x=10: a₁=10, a₂=-10, a₃=10)
 
 ## Complexity
 - **Time:** O((N+M) log(N+M)) for DFS + sorting
