@@ -19,33 +19,30 @@ int main() {
         string expectedOutput((istreambuf_iterator<char>(outputFile)), istreambuf_iterator<char>());
         outputFile.close();
         
-        // Generate actual output
-        string actualOutput;
-        int numTestCases;
-        inputFile >> numTestCases;
-        
-        while (numTestCases--) {
-            int numRods, numConstraints;
-            inputFile >> numRods >> numConstraints;
-            
-            vector<ll> lowerBound(numRods), upperBound(numRods);
-            for (ll &bound : lowerBound) inputFile >> bound;
-            for (ll &bound : upperBound) inputFile >> bound;
-            
-            vector<vector<pair<int, ll>>> adjacencyList(numRods);
-            for (int c = 0; c < numConstraints; c++) {
-                int rod1, rod2;
-                ll constraintValue;
-                inputFile >> rod1 >> rod2 >> constraintValue;
-                rod1--; rod2--;  // Convert to 0-indexed
-                adjacencyList[rod1].push_back({rod2, constraintValue});
-                adjacencyList[rod2].push_back({rod1, constraintValue});
-            }
-            
-            int result = solveCase(numRods, numConstraints, lowerBound, upperBound, adjacencyList);
-            actualOutput += to_string(result) + "\n";
-        }
+        // Read input data
+        stringstream buffer;
+        buffer << inputFile.rdbuf();
+        string inputData = buffer.str();
         inputFile.close();
+        
+        // Redirect cin/cout
+        istringstream iss(inputData);
+        ostringstream oss;
+        streambuf* cinbuf = cin.rdbuf();
+        streambuf* coutbuf = cout.rdbuf();
+        cin.rdbuf(iss.rdbuf());
+        cout.rdbuf(oss.rdbuf());
+        
+        // Run solve() for each test case
+        int T;
+        cin >> T;
+        while (T--) solve();
+        
+        // Restore cin/cout
+        cin.rdbuf(cinbuf);
+        cout.rdbuf(coutbuf);
+        
+        string actualOutput = oss.str();
         
         // Compare outputs
         if (actualOutput == expectedOutput) {
