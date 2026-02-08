@@ -11,7 +11,18 @@ build/
 bin/
 
 # VS Code
-.vscode/
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/settings.json
+!prob1_bronze_season26contest1/python/.vscode/
+!prob1_bronze_season26contest1/python/.vscode/launch.json
+!prob1_bronze_season26contest1/java/.vscode/
+!prob1_bronze_season26contest1/java/.vscode/launch.json
+!prob1_bronze_season26contest1/java/.vscode/tasks.json
+!prob1_bronze_season26contest1/cpp/.vscode/
+!prob1_bronze_season26contest1/cpp/.vscode/launch.json
+!prob1_bronze_season26contest1/cpp/.vscode/tasks.json
 
 # Mac/Linux editor files
 *.swp
@@ -21,3 +32,10 @@ bin/
 # Logs and temporary
 *.log
 out
+
+# Java
+*.class
+
+# Python
+__pycache__/
+*.pyc

@@ -1,33 +1,17 @@
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Collections;
 import java.util.List;
 
 public class TestRunner {
-    private static long solveCase(long a, long b, long cA, long cB, long fA) {
-        long initialA = (b / cB) * cA + a;
-        if (initialA >= fA) {
-            return 0L;
-        }
-
-        long needA = fA - 1 - initialA;
-        long y = cB - 1 - (b % cB);
-
-        if (cA >= cB) {
-            y += needA;
-        } else {
-            y += (needA / cA) * cB + (needA % cA);
-        }
-
-        return y + 1;
-    }
-
     private static List<String> runFile(Path file) throws IOException {
         FastScanner fs = new FastScanner(file);
         int t = fs.nextInt();
@@ -41,13 +25,33 @@ public class TestRunner {
             long cA = fs.nextLong();
             long cB = fs.nextLong();
             long fA = fs.nextLong();
-            outputs.add(Long.toString(solveCase(a, b, cA, cB, fA)));
+            outputs.add(Long.toString(Solution.solveCase(a, b, cA, cB, fA)));
         }
         return outputs;
     }
 
+    private static List<String> readExpected(Path file) throws IOException {
+        FastScanner fs = new FastScanner(file);
+        List<String> outputs = new ArrayList<>();
+        String token;
+        while ((token = fs.nextToken()) != null) {
+            outputs.add(token);
+        }
+        return outputs;
+    }
+
+    private static Path getBaseDir() throws URISyntaxException {
+        Path location = Paths.get(TestRunner.class.getProtectionDomain()
+                .getCodeSource().getLocation().toURI());
+        if (Files.isRegularFile(location)) {
+            return location.getParent();
+        }
+        return location;
+    }
+
     public static void main(String[] args) throws Exception {
-        Path testDir = Paths.get("..", "testData").normalize();
+        Path baseDir = getBaseDir();
+        Path testDir = baseDir.resolve("..").resolve("testData").normalize();
         if (!Files.isDirectory(testDir)) {
             System.out.println("testData folder not found: " + testDir.toAbsolutePath());
             return;
@@ -59,16 +63,35 @@ public class TestRunner {
                 files.add(p);
             }
         }
-        files.sort(Comparator.comparingInt(p -> p.getFileName().toString().length())
-                .thenComparing(p -> p.getFileName().toString()));
+        Collections.sort(files, new Comparator<Path>() {
+            @Override
+            public int compare(Path a, Path b) {
+                String aName = a.getFileName().toString();
+                String bName = b.getFileName().toString();
+                if (aName.length() != bName.length()) {
+                    return Integer.compare(aName.length(), bName.length());
+                }
+                return aName.compareTo(bName);
+            }
+        });
 
         PrintWriter out = new PrintWriter(System.out);
         for (Path p : files) {
-            out.println(p.getFileName() + ":");
-            for (String line : runFile(p)) {
-                out.println(line);
+            Path outPath = testDir.resolve(p.getFileName().toString().replace(".in", ".out"));
+            List<String> outputs = runFile(p);
+            boolean hasExpected = Files.exists(outPath);
+            List<String> expected = hasExpected ? readExpected(outPath) : new ArrayList<>();
+
+            String status;
+            if (!hasExpected) {
+                status = "MISSING .out";
+            } else if (outputs.equals(expected)) {
+                status = "PASS";
+            } else {
+                status = "FAIL";
             }
-            out.println("-");
+
+            out.println(p.getFileName() + ": " + status);
         }
         out.flush();
     }
@@ -134,6 +157,22 @@ public class TestRunner {
                 c = read();
             }
             return val * sign;
+        }
+
+        String nextToken() throws IOException {
+            int c;
+            do {
+                c = read();
+                if (c == -1) {
+                    return null;
+                }
+            } while (c <= ' ');
+            StringBuilder sb = new StringBuilder();
+            while (c > ' ') {
+                sb.append((char) c);
+                c = read();
+            }
+            return sb.toString();
         }
     }
 }

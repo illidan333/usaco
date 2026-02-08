@@ -3,7 +3,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class Solution {
-    private static long solveCase(long a, long b, long cA, long cB, long fA) {
+    public static long solveCase(long a, long b, long cA, long cB, long fA) {
         long initialA = (b / cB) * cA + a;
         if (initialA >= fA) {
             return 0L;

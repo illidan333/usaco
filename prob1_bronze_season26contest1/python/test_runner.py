@@ -1,7 +1,6 @@
 import os
-import sys
 
-from solution import solve_case
+import solution
 
 
 def run_file(path):
@@ -19,8 +18,16 @@ def run_file(path):
         c_b = int(data[idx + 3])
         f_a = int(data[idx + 4])
         idx += 5
-        results.append(str(solve_case(a, b, c_a, c_b, f_a)))
+        results.append(str(solution.solve(a, b, c_a, c_b, f_a)))
     return results
+
+
+def read_expected(path):
+    with open(path, "r", encoding="utf-8") as f:
+        content = f.read().strip()
+    if not content:
+        return []
+    return content.split()
 
 
 def main():
@@ -34,11 +41,21 @@ def main():
     files.sort(key=lambda x: (len(x), x))
 
     for name in files:
-        path = os.path.join(test_dir, name)
-        outputs = run_file(path)
-        print(f"{name}:")
-        print("\n".join(outputs))
-        print("-")
+        in_path = os.path.join(test_dir, name)
+        out_name = name.replace(".in", ".out")
+        out_path = os.path.join(test_dir, out_name)
+
+        outputs = run_file(in_path)
+        expected = read_expected(out_path) if os.path.exists(out_path) else None
+
+        if expected is None:
+            status = "MISSING .out"
+        elif outputs == expected:
+            status = "PASS"
+        else:
+            status = "FAIL"
+
+        print(f"{name}: {status}")
 
 
 if __name__ == "__main__":

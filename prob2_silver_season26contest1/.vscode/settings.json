@@ -1,0 +1,20 @@
+{
+    "debug.defaultLaunchConfig": "Launch C++ Active File",
+    "[python]": {
+        "debug.defaultLaunchConfig": "Launch Python File"
+    },
+    "[java]": {
+        "debug.defaultLaunchConfig": "Launch TestRunner.java"
+    },
+    "[cpp]": {
+        "debug.defaultLaunchConfig": "Launch C++ Active File"
+    },
+    "[c]": {
+        "debug.defaultLaunchConfig": "Launch C++ Active File"
+    },
+    "files.associations": {
+        "*.cpp": "cpp",
+        "*.h": "cpp",
+        "*.hpp": "cpp"
+    }
+}

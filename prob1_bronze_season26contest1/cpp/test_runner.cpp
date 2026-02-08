@@ -1,26 +1,7 @@
 #include <bits/stdc++.h>
 #include <filesystem>
+#include "solution_impl.h"
 using namespace std;
-
-using ll = long long;
-
-ll solve_case(ll a, ll b, ll c_a, ll c_b, ll f_a) {
-    ll initial_a = (b / c_b) * c_a + a;
-    if (initial_a >= f_a) {
-        return 0;
-    }
-
-    ll need_a = f_a - 1 - initial_a;
-    ll y = c_b - 1 - (b % c_b);
-
-    if (c_a >= c_b) {
-        y += need_a;
-    } else {
-        y += (need_a / c_a) * c_b + (need_a % c_a);
-    }
-
-    return y + 1;
-}
 
 vector<string> run_file(const string &path) {
     ifstream in(path);
@@ -37,14 +18,31 @@ vector<string> run_file(const string &path) {
     return out;
 }
 
-int main() {
+vector<string> read_expected(const string &path) {
+    ifstream in(path);
+    vector<string> out;
+    string token;
+    while (in >> token) {
+        out.push_back(token);
+    }
+    return out;
+}
+
+int main(int argc, char **argv) {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
 
-    string test_dir = "..\\testData";
+    namespace fs = std::filesystem;
+    fs::path base_dir = fs::absolute(fs::path(argv[0])).parent_path();
+    fs::path test_dir = (base_dir / ".." / "testData").lexically_normal();
     vector<string> files;
 
-    for (const auto &entry : std::filesystem::directory_iterator(test_dir)) {
+    if (!fs::is_directory(test_dir)) {
+        cout << "testData folder not found: " << test_dir.string() << "\n";
+        return 0;
+    }
+
+    for (const auto &entry : fs::directory_iterator(test_dir)) {
         if (!entry.is_regular_file()) {
             continue;
         }
@@ -62,13 +60,23 @@ int main() {
     });
 
     for (const string &name : files) {
-        string path = test_dir + "\\" + name;
-        vector<string> outputs = run_file(path);
-        cout << name << ":\n";
-        for (const string &line : outputs) {
-            cout << line << "\n";
+        fs::path in_path = test_dir / name;
+        fs::path out_path = test_dir / (name.substr(0, name.size() - 3) + ".out");
+
+        vector<string> outputs = run_file(in_path.string());
+        bool has_expected = fs::exists(out_path);
+        vector<string> expected = has_expected ? read_expected(out_path.string()) : vector<string>();
+
+        string status;
+        if (!has_expected) {
+            status = "MISSING .out";
+        } else if (outputs == expected) {
+            status = "PASS";
+        } else {
+            status = "FAIL";
         }
-        cout << "-\n";
+
+        cout << name << ": " << status << "\n";
     }
 
     return 0;
