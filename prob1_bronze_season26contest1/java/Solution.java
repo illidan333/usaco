@@ -4,7 +4,7 @@ import java.util.Scanner;
 public class Solution {
     public static long solveCase(long startA, long startB, long rateA, long rateB, long targetA) {
         long initialA = (startB / rateB) * rateA + startA;
-        if (initialA >= targetA) {
+        if (initialA >=  targetA) {
             return 0L;
         }
 

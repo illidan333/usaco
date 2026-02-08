@@ -62,15 +62,15 @@ The answer is $y + 1$.
 ## Mermaid diagram
 ```mermaid
 flowchart TD
-    S[Read A,B,cA,cB,fA] --> C[Compute A_init = A + floor(B/cB)*cA]
-    C --> D{A_init >= fA?}
-    D -- Yes --> Z[Answer = 0]
-    D -- No --> E[need = fA - 1 - A_init]
-    E --> F[nB0 = cB - 1 - (B mod cB)]
-    F --> G{cA >= cB?}
-    G -- Yes --> H[y = nB0 + need]
-    G -- No --> I[y = nB0 + floor(need/cA)*cB + (need mod cA)]
-    H --> J[Answer = y + 1]
+    S[Read A, B, cA, cB, fA] --> C["Compute A_init as A plus (B divided by cB) times cA"]
+    C --> D{Is A_init greater than or equal to fA?}
+    D -- Yes --> Z[Answer is 0]
+    D -- No --> E["Calculate need as fA minus 1 minus A_init"]
+    E --> F["nB0 equals cB minus 1 minus (B mod cB)"]
+    F --> G{Is cA greater than or equal to cB?}
+    G -- Yes --> H["y equals nB0 plus need"]
+    G -- No --> I["y equals nB0 plus (need divided by cA) times cB plus (need mod cA)"]
+    H --> J[Answer is y plus 1]
     I --> J
 ```
 

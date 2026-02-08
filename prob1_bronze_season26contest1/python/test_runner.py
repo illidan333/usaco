@@ -1,4 +1,5 @@
 import os
+import time
 
 import solution
 
@@ -40,11 +41,13 @@ def main():
     files = [f for f in os.listdir(test_dir) if f.endswith(".in")]
     files.sort(key=lambda x: (len(x), x))
 
+    total_start = time.perf_counter()
     for name in files:
         in_path = os.path.join(test_dir, name)
         out_name = name.replace(".in", ".out")
         out_path = os.path.join(test_dir, out_name)
 
+        case_start = time.perf_counter()
         outputs = run_file(in_path)
         expected = read_expected(out_path) if os.path.exists(out_path) else None
 
@@ -55,7 +58,11 @@ def main():
         else:
             status = "FAIL"
 
-        print(f"{name}: {status}")
+        elapsed_ms = (time.perf_counter() - case_start) * 1000.0
+        print(f"{name}: {status} ({elapsed_ms:.2f} ms)")
+
+    total_ms = (time.perf_counter() - total_start) * 1000.0
+    print(f"Total: {total_ms:.2f} ms")
 
 
 if __name__ == "__main__":

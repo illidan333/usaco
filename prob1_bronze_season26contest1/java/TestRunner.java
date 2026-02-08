@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class TestRunner {
@@ -87,8 +88,10 @@ public class TestRunner {
         });
 
         PrintWriter out = new PrintWriter(System.out);
+        long totalStart = System.nanoTime();
         for (Path p : files) {
             Path outPath = testDir.resolve(p.getFileName().toString().replace(".in", ".out"));
+            long caseStart = System.nanoTime();
             List<String> outputs = runFile(p);
             boolean hasExpected = Files.exists(outPath);
             List<String> expected = hasExpected ? readExpected(outPath) : new ArrayList<>();
@@ -102,8 +105,11 @@ public class TestRunner {
                 status = "FAIL";
             }
 
-            out.println(p.getFileName() + ": " + status);
+            double elapsedMs = (System.nanoTime() - caseStart) / 1_000_000.0;
+            out.println(p.getFileName() + ": " + status + String.format(Locale.US, " (%.2f ms)", elapsedMs));
         }
+        double totalMs = (System.nanoTime() - totalStart) / 1_000_000.0;
+        out.println(String.format(Locale.US, "Total: %.2f ms", totalMs));
         out.flush();
     }
 

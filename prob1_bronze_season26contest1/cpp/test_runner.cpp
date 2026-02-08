@@ -1,6 +1,7 @@
-#include <bits/stdc++.h>
+#define INCLUDED_IN_TEST
+#include "solution.cpp"
 #include <filesystem>
-#include "solution_impl.h"
+#include <chrono>
 using namespace std;
 
 vector<string> run_file(const string &path) {
@@ -59,10 +60,12 @@ int main(int argc, char **argv) {
         return a < b;
     });
 
+    auto total_start = chrono::steady_clock::now();
     for (const string &name : files) {
         fs::path in_path = test_dir / name;
         fs::path out_path = test_dir / (name.substr(0, name.size() - 3) + ".out");
 
+        auto case_start = chrono::steady_clock::now();
         vector<string> outputs = run_file(in_path.string());
         bool has_expected = fs::exists(out_path);
         vector<string> expected = has_expected ? read_expected(out_path.string()) : vector<string>();
@@ -76,8 +79,14 @@ int main(int argc, char **argv) {
             status = "FAIL";
         }
 
-        cout << name << ": " << status << "\n";
+        auto case_end = chrono::steady_clock::now();
+        double elapsed_ms = chrono::duration<double, milli>(case_end - case_start).count();
+        cout << name << ": " << status << " (" << fixed << setprecision(2) << elapsed_ms << " ms)\n";
     }
+
+    auto total_end = chrono::steady_clock::now();
+    double total_ms = chrono::duration<double, milli>(total_end - total_start).count();
+    cout << "Total: " << fixed << setprecision(2) << total_ms << " ms\n";
 
     return 0;
 }
