@@ -1,4 +1,3 @@
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
@@ -10,33 +9,36 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 
 public class TestRunner {
     private static List<String> runFile(Path file) throws IOException {
-        FastScanner fs = new FastScanner(file);
-        int t = fs.nextInt();
         List<String> outputs = new ArrayList<>();
-        if (t == -1) {
+        Scanner sc = new Scanner(Files.newBufferedReader(file));
+        if (!sc.hasNextInt()) {
+            sc.close();
             return outputs;
         }
+        int t = sc.nextInt();
         for (int i = 0; i < t; i++) {
-            long a = fs.nextLong();
-            long b = fs.nextLong();
-            long cA = fs.nextLong();
-            long cB = fs.nextLong();
-            long fA = fs.nextLong();
+            long a = sc.nextLong();
+            long b = sc.nextLong();
+            long cA = sc.nextLong();
+            long cB = sc.nextLong();
+            long fA = sc.nextLong();
             outputs.add(Long.toString(Solution.solveCase(a, b, cA, cB, fA)));
         }
+        sc.close();
         return outputs;
     }
 
     private static List<String> readExpected(Path file) throws IOException {
-        FastScanner fs = new FastScanner(file);
         List<String> outputs = new ArrayList<>();
-        String token;
-        while ((token = fs.nextToken()) != null) {
-            outputs.add(token);
+        Scanner sc = new Scanner(Files.newBufferedReader(file));
+        while (sc.hasNext()) {
+            outputs.add(sc.next());
         }
+        sc.close();
         return outputs;
     }
 
@@ -49,9 +51,18 @@ public class TestRunner {
         return location;
     }
 
-    public static void main(String[] args) throws Exception {
+    private static Path findTestDir() throws URISyntaxException {
+        Path cwd = Paths.get(System.getProperty("user.dir"));
+        Path testDir = cwd.resolve("testData");
+        if (Files.isDirectory(testDir)) {
+            return testDir;
+        }
         Path baseDir = getBaseDir();
-        Path testDir = baseDir.resolve("..").resolve("testData").normalize();
+        return baseDir.resolve("..").resolve("testData").normalize();
+    }
+
+    public static void main(String[] args) throws Exception {
+        Path testDir = findTestDir();
         if (!Files.isDirectory(testDir)) {
             System.out.println("testData folder not found: " + testDir.toAbsolutePath());
             return;
@@ -96,83 +107,4 @@ public class TestRunner {
         out.flush();
     }
 
-    private static class FastScanner {
-        private final BufferedInputStream in;
-        private final byte[] buffer = new byte[1 << 16];
-        private int ptr = 0;
-        private int len = 0;
-
-        FastScanner(Path path) throws IOException {
-            in = new BufferedInputStream(Files.newInputStream(path));
-        }
-
-        private int read() throws IOException {
-            if (ptr >= len) {
-                len = in.read(buffer);
-                ptr = 0;
-                if (len <= 0) {
-                    return -1;
-                }
-            }
-            return buffer[ptr++];
-        }
-
-        int nextInt() throws IOException {
-            int c;
-            do {
-                c = read();
-                if (c == -1) {
-                    return -1;
-                }
-            } while (c <= ' ');
-            int sign = 1;
-            if (c == '-') {
-                sign = -1;
-                c = read();
-            }
-            int val = 0;
-            while (c > ' ') {
-                val = val * 10 + (c - '0');
-                c = read();
-            }
-            return val * sign;
-        }
-
-        long nextLong() throws IOException {
-            int c;
-            do {
-                c = read();
-                if (c == -1) {
-                    return -1L;
-                }
-            } while (c <= ' ');
-            int sign = 1;
-            if (c == '-') {
-                sign = -1;
-                c = read();
-            }
-            long val = 0;
-            while (c > ' ') {
-                val = val * 10 + (c - '0');
-                c = read();
-            }
-            return val * sign;
-        }
-
-        String nextToken() throws IOException {
-            int c;
-            do {
-                c = read();
-                if (c == -1) {
-                    return null;
-                }
-            } while (c <= ' ');
-            StringBuilder sb = new StringBuilder();
-            while (c > ' ') {
-                sb.append((char) c);
-                c = read();
-            }
-            return sb.toString();
-        }
-    }
 }
