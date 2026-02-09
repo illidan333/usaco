@@ -23,21 +23,21 @@ public class Solution {
     }
 
     public static void main(String[] args) {
-        Scanner in = new Scanner(System.in);
-        PrintWriter out = new PrintWriter(System.out);
-        if (!in.hasNextInt()) {
+        try (Scanner in = new Scanner(System.in); PrintWriter out = new PrintWriter(System.out)) {
+            if (!in.hasNextInt()) {
+                out.flush();
+                return;
+            }
+            int testCases = in.nextInt();
+            for (int i = 0; i < testCases; i++) {
+                long startA = in.nextLong();
+                long startB = in.nextLong();
+                long rateA = in.nextLong();
+                long rateB = in.nextLong();
+                long targetA = in.nextLong();
+                out.println(solveCase(startA, startB, rateA, rateB, targetA));
+            }
             out.flush();
-            return;
         }
-        int testCases = in.nextInt();
-        for (int i = 0; i < testCases; i++) {
-            long startA = in.nextLong();
-            long startB = in.nextLong();
-            long rateA = in.nextLong();
-            long rateB = in.nextLong();
-            long targetA = in.nextLong();
-            out.println(solveCase(startA, startB, rateA, rateB, targetA));
-        }
-        out.flush();
     }
 }
