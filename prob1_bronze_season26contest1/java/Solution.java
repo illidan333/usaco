@@ -3,21 +3,23 @@ import java.util.Scanner;
 
 public class Solution {
     public static long solveCase(long startA, long startB, long rateA, long rateB, long targetA) {
-        long initialA = (startB / rateB) * rateA + startA;
-        if (initialA >=  targetA) {
+        long aAfterExchange = (startB / rateB) * rateA + startA;
+        if (aAfterExchange >=  targetA) {
             return 0L;
         }
 
-        long needA = targetA - 1 - initialA;
-        long y = rateB - 1 - (startB % rateB);
+        long remainingA = targetA - aAfterExchange;
+        long remainingABeforeFinal = remainingA - 1;
+        long chipsToNextBIncrease = rateB - (startB % rateB);
+        long totalChipsNeeded = chipsToNextBIncrease;
 
         if (rateA >= rateB) {
-            y += needA;
+            totalChipsNeeded += remainingABeforeFinal;
         } else {
-            y += (needA / rateA) * rateB + (needA % rateA);
+            totalChipsNeeded += (remainingABeforeFinal / rateA) * rateB + (remainingABeforeFinal % rateA);
         }
 
-        return y + 1;
+        return totalChipsNeeded;
     }
 
     public static void main(String[] args) {

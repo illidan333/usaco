@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch TestRunner.java",
+            "type": "java",
+            "request": "launch",
+            "preLaunchTask": "Java: build TestRunner",
+            "mainClass": "TestRunner",
+            "cwd": "${workspaceFolder}",
+            "args": [],
+            "classPaths": [
+                "${workspaceFolder}"
+            ]
+        }
+    ]
+}

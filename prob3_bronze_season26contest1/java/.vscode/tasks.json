@@ -1,0 +1,21 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "Java: build TestRunner",
+            "command": "javac",
+            "args": [
+                "Solution.java",
+                "TestRunner.java"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$javac"
+            ],
+            "group": "build"
+        }
+    ]
+}

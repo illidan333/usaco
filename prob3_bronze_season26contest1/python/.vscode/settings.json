@@ -1,0 +1,6 @@
+{
+    "debug.defaultLaunchConfig": "Launch Python File",
+    "[python]": {
+        "debug.defaultLaunchConfig": "Launch Python File"
+    }
+}

@@ -157,3 +157,24 @@ int solveCase(int n, int m, vector<ll>& l, vector<ll>& r,
 - Algorithm explanation: [EXPLANATION.md](../prob2_silver_season26contest1/EXPLANATION.md)
 - Visual examples with Mermaid: [EXPLANATION.md](../prob2_silver_season26contest1/EXPLANATION.md)
 - Test harness: [test.cpp](../prob2_silver_season26contest1/test.cpp)
+
+## Standard USACO Problem Scaffolding
+When the user asks to set up another USACO problem (same pattern as prior contest problems), do the following by default unless they say otherwise:
+
+1. Create a new folder named with the problem identifier (e.g., prob3_bronze_season26contest1).
+2. Download and save the three problem assets:
+    - View problem -> problem.html
+    - Solution -> solution.html
+    - Test data -> extract into testData/
+3. Create the same structure as prob1_bronze_season26contest1:
+    - cpp/, java/, python/, testData/, .vscode/, plus language-specific .vscode folders.
+    - Copy the VS Code tasks/launch configs from prob1_bronze_season26contest1 into the new folder.
+    - Create a .code-workspace file with the folder path set to ".".
+4. Implement the solution in C++, Java, and Python with:
+    - A shared solve function (e.g., solve_all/solveAll/solve_all) used by runners.
+    - Full test runner that iterates testData/*.in and compares to *.out.
+    - Single test runner that reads from single_test_input.txt.
+5. Provide explanation.md with key idea, algorithm, correctness sketch, complexity, and a concise example.
+6. Ensure all code respects the USACO guidelines above (long long usage, naming, clarity).
+
+If direct URLs are missing, ask the user for them (or a cpid). If a download fails, ask for alternative links.

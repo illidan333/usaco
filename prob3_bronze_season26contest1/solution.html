@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html><head>
+<title>Contest Results</title>
+<META HTTP-EQUIV="EXPIRES" CONTENT="0">
+<META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+<META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE">
+
+</head>
+<body>
+(Analysis by Brian Law)
+<p><strong>Subtask 1 <span class='math'>$(N \leq 50, Q \leq 100)$</span>:</strong>
+<p>We can keep track of the beauty value of the cow at each position in the grid.
+After each update, we recompute the attractiveness index for every possible
+picture, keeping track of the maximum index.
+<p>Every update requires spending <span class='math'>$O(K^2)$</span> time computing the attractiveness index
+for each of <span class='math'>$(N - K + 1)^2$</span> possible pictures. Over <span class='math'>$Q$</span> updates, the total time
+complexity is <span class='math'>$O(QN^2K^2)$</span>.
+<p>My C++ code:
+<p><pre class='prettyprint'>
+#include &lt;algorithm&gt;
+#include &lt;ios&gt;
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+
+using namespace std;
+
+void solve() {
+
+    int k;
+    int n;
+    int q;
+
+    cin &gt;&gt; n &gt;&gt; k &gt;&gt; q;
+
+    vector vals(n, vector&lt;int&gt;(n));
+
+    for (int i = 0; i &lt; q; ++i) {
+        int c;
+        int r;
+        cin &gt;&gt; r &gt;&gt; c;
+        --r;
+        --c;
+        cin &gt;&gt; vals[r][c];
+        int mx_sum = 0;
+        for (int j = 0; j &lt;= n - k; ++j) {
+            for (int l = 0; l &lt;= n - k; ++l) {
+                int cur_sum = 0;
+                for (int m = 0; m &lt; k; ++m) {
+                    for (int o = 0; o &lt; k; ++o) {
+                        cur_sum += vals[j + m][l + o];
+                    }
+                }
+                mx_sum = max(mx_sum, cur_sum);
+            }
+        }
+        cout &lt;&lt; mx_sum &lt;&lt; &apos;\n&apos;;
+    }
+
+}
+
+int main() {
+
+    cin.tie(nullptr);
+
+    ios_base::sync_with_stdio(false);
+
+    solve();
+
+    return 0;
+
+}
+</pre>
+<p><strong>Subtask 2 <span class='math'>$(N \leq 50)$</span>:</strong>
+<p>An inefficiency to our solution in Subtask 1 is recomputing the attractiveness
+index for each picture. In fact, each update will only alter the attractiveness
+index in up to <span class='math'>$K^2$</span> pictures. A cow at position <span class='math'>$(r, c)$</span> can only belong to the
+pictures whose top-left corner has row and column in the ranges <span class='math'>$[r - K + 1, r]$</span>
+and <span class='math'>$[c - K + 1, c]$</span> respectively.
+<p>For each of these pictures, the attractiveness index increases by exactly the
+change in the updated cow’s beauty value. We can maintain the attractiveness
+index for all <span class='math'>$(N - K + 1)^2$</span> pictures, updating affected pictures after every
+update.
+<p>After each update, scanning every picture allows us to find the maximum
+attractiveness index in <span class='math'>$O(N^2)$</span>, resulting in a total time complexity of
+<span class='math'>$O(QN^2)$</span>.
+<p><strong>Full Credit:</strong>
+<p>Because the problem guarantees that each cow&apos;s beauty value only increases,
+every picture&apos;s attractiveness index is non-decreasing. Instead of rescanning
+all pictures, comparing updated ones against the current maximum suffices.
+<p>The time complexity is <span class='math'>$O(N^2 + QK^2)$</span>.
+<p>My C++ code:
+<p><pre class='prettyprint'>
+#include &lt;algorithm&gt;
+#include &lt;ios&gt;
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+
+using namespace std;
+
+void solve() {
+
+    int k;
+    int n;
+    int q;
+
+    cin &gt;&gt; n &gt;&gt; k &gt;&gt; q;
+
+    int mx_sum = 0;
+    vector sums(n, vector&lt;int&gt;(n));
+    vector vals(n, vector&lt;int&gt;(n));
+
+    for (int i = 0; i &lt; q; ++i) {
+        int c;
+        int r;
+        int v;
+        cin &gt;&gt; r &gt;&gt; c &gt;&gt; v;
+        --r;
+        --c;
+        const int diff = v - vals[r][c];
+        vals[r][c] = v;
+        for (int j = max(r - k + 1, 0); j &lt;= min(r, n - k); ++j) {
+            for (int l = max(c - k + 1, 0); l &lt;= min(c, n - k); ++l) {
+                sums[j][l] += diff;
+                mx_sum = max(mx_sum, sums[j][l]);
+            }
+        }
+        cout &lt;&lt; mx_sum &lt;&lt; &apos;\n&apos;;
+    }
+
+}
+
+int main() {
+
+    cin.tie(nullptr);
+
+    ios_base::sync_with_stdio(false);
+
+    solve();
+
+    return 0;
+
+}
+</pre></body></html>
