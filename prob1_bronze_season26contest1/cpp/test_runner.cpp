@@ -1,7 +1,13 @@
 #define INCLUDED_IN_TEST
 #include "solution.cpp"
-#include <filesystem>
+#include <algorithm>
 #include <chrono>
+#include <filesystem>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <string>
+#include <vector>
 using namespace std;
 
 vector<string> run_file(const string &path) {
