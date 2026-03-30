@@ -1,0 +1,29 @@
+https://codeforces.com/gym/102951/problem/B
+
+B. Studying Algorithms
+time limit per test2 seconds
+memory limit per test256 megabytes
+Steph wants to improve her knowledge of algorithms over winter break. She has a total of 𝑋
+ (1≤𝑋≤104
+) minutes to dedicate to learning algorithms. There are 𝑁
+ (1≤𝑁≤100
+) algorithms, and each one of them requires 𝑎𝑖
+ (1≤𝑎𝑖≤100
+) minutes to learn. Find the maximum number of algorithms she can learn.
+
+Input
+Line 1: Two space-separated integers 𝑁
+ and 𝑋
+
+Line 2: 𝑁
+ space-separated integers 𝑎1,𝑎2,…𝑎𝑁
+
+Output
+A single integer, the answer to the problem.
+
+Example
+InputCopy
+6 15
+4 3 8 4 7 3
+OutputCopy
+4
