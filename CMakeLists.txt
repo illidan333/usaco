@@ -15,4 +15,5 @@ add_executable(usaco
         study_algo/algo.cpp
         usaco_guide/silver/prio_q/prio_q_demo.cpp
         usaco_guide/silver/prio_q/room_alloc.cpp
-        usaco_guide/silver/flood_fill/counting_rooms.cpp)
+        usaco_guide/silver/flood_fill/counting_rooms.cpp
+        usaco_guide/silver/tree/subordinates.cpp)
