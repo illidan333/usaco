@@ -16,4 +16,6 @@ add_executable(usaco
         usaco_guide/silver/prio_q/prio_q_demo.cpp
         usaco_guide/silver/prio_q/room_alloc.cpp
         usaco_guide/silver/flood_fill/counting_rooms.cpp
-        usaco_guide/silver/tree/subordinates.cpp)
+        usaco_guide/silver/tree/subordinates.cpp
+        usaco_guide/silver/func_graph/coop_game.cpp
+        usaco_guide/silver/func_graph/badge.cpp)
